@@ -77,7 +77,7 @@ metadata:
   namespace: capi-clusters
 spec:
   clusterName: aws-rke2-cluster
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       cluster.x-k8s.io/cluster-name: aws-rke2-cluster
