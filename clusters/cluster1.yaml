@@ -1,0 +1,129 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: capi-clusters
+  labels:
+    cluster-api.cattle.io/rancher-auto-import: "true"  # Auto-import all clusters in this namespace
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: aws-rke2-cluster
+  namespace: capi-clusters
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["192.168.0.0/16"]
+    services:
+      cidrBlocks: ["10.128.0.0/12"]
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+    kind: AWSCluster
+    name: aws-rke2-cluster
+  controlPlaneRef:
+    kind: RKE2ControlPlane
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    name: aws-rke2-cluster-control-plane
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSCluster
+metadata:
+  name: aws-rke2-cluster
+  namespace: capi-clusters
+spec:
+  region: eu-central-1
+  sshKeyName: SuseKeyPair
+  networkSpec:
+    vpc:
+      cidrBlock: 10.0.0.0/16
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: RKE2ControlPlane
+metadata:
+  name: aws-rke2-cluster-control-plane
+  namespace: capi-clusters
+spec:
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+      kind: AWSMachineTemplate
+      name: aws-rke2-cluster-control-plane
+  replicas: 1
+  rke2:
+    version: v1.31.6+rke2r1
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSMachineTemplate
+metadata:
+  name: aws-rke2-cluster-control-plane
+  namespace: capi-clusters
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-0242afb1ddd216f95
+      instanceType: t3a.large
+      rootVolume:
+        size: 80
+        type: gp3
+      iamInstanceProfile: control-plane.cluster-api-provider-aws.sigs.k8s.io
+      sshKeyName: SuseKeyPair
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: aws-rke2-cluster-md-0
+  namespace: capi-clusters
+spec:
+  clusterName: aws-rke2-cluster
+  replicas: 2
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: aws-rke2-cluster
+      cluster.x-k8s.io/deployment-name: aws-rke2-cluster-md-0
+  template:
+    metadata:
+      labels:
+        cluster.x-k8s.io/cluster-name: aws-rke2-cluster
+        cluster.x-k8s.io/deployment-name: aws-rke2-cluster-md-0
+    spec:
+      clusterName: aws-rke2-cluster
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: RKE2ConfigTemplate
+          name: aws-rke2-cluster-md-0
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+        kind: AWSMachineTemplate
+        name: aws-rke2-cluster-md-0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSMachineTemplate
+metadata:
+  name: aws-rke2-cluster-md-0
+  namespace: capi-clusters
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-0242afb1ddd216f95
+      instanceType: t3a.large
+      rootVolume:
+        size: 80
+        type: gp3
+      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      sshKeyName: my-aws-key
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: RKE2ConfigTemplate
+metadata:
+  name: aws-rke2-cluster-md-0
+  namespace: capi-clusters
+spec:
+  template:
+    spec:
+      rke2:
+        version: v1.31.6+rke2r1
+        role: agent
