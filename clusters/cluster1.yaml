@@ -117,7 +117,7 @@ metadata:
   namespace: capi-clusters
 spec:
   agentConfig:
-    airGapped: true
+    airGapped: false
     kubelet:
       extraArgs:
       - --cloud-provider=external
@@ -154,7 +154,7 @@ spec:
       ami:
         id: ami-0242afb1ddd216f95
       iamInstanceProfile: control-plane.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: t3a.large
+      instanceType: t3a.medium
       rootVolume:
         size: 50
       sshKeyName: SuseKeyPair
@@ -198,7 +198,7 @@ spec:
       ami:
         id: ami-0242afb1ddd216f95
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: t3a.large
+      instanceType: t3a.medium
       rootVolume:
         size: 50
       sshKeyName: SuseKeyPair
@@ -212,7 +212,7 @@ spec:
   template:
     spec:
       agentConfig:
-        airGapped: true
+        airGapped: false
         kubelet:
           extraArgs:
           - --cloud-provider=external
