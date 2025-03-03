@@ -224,6 +224,11 @@ kind: AWSClusterControllerIdentity
 metadata:
   name: default
   namespace: capi-clusters
+  labels:
+    app.kubernetes.io/managed-by: "Helm"
+  annotations:
+    meta.helm.sh/release-name: "capi-aws"
+    meta.helm.sh/release-namespace: "fleet-default"
 spec:
   allowedNamespaces:
     list:
