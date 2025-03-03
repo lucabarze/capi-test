@@ -118,7 +118,6 @@ metadata:
   namespace: capi-clusters
 spec:
   agentConfig:
-    airGapped: false
     kubelet:
       extraArgs:
       - --cloud-provider=external
@@ -213,7 +212,6 @@ spec:
   template:
     spec:
       agentConfig:
-        airGapped: false
         kubelet:
           extraArgs:
           - --cloud-provider=external
