@@ -220,21 +220,6 @@ spec:
       preRKE2Commands:
       - sudo hostnamectl set-hostname $(curl -s http://169.254.169.254/1.0/meta-data/hostname)
 ---
-apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
-kind: AWSClusterControllerIdentity
-metadata:
-  name: default
-  namespace: capi-clusters
-  labels:
-    app.kubernetes.io/managed-by: "Helm"
-  annotations:
-    meta.helm.sh/release-name: "capi-aws"
-    meta.helm.sh/release-namespace: "fleet-local"
-spec:
-  allowedNamespaces:
-    list:
-    - capi-clusters
----
 apiVersion: addons.cluster.x-k8s.io/v1beta1
 kind: ClusterResourceSet
 metadata:
